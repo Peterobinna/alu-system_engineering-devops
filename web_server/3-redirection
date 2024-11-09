@@ -1,22 +1,15 @@
 #!/usr/bin/env bash
-# Updates the current state of the server
-# Installs Nginx on the server
-# Overwrites the default page of nginx
-# Overwrites the default configuration file with the redirect
-# Restarts nginx
+# Configuring  Nginx server so that /redirect_me is redirecting to another page.
 
-apt-get -y update
-apt-get install -y nginx
-echo "Holberton School!" > /var/www/html/index.html
-echo "server {
-	listen 80 default_server;
-	listen [::]:80 default_server;
-	root /var/www/html;
-	index index.html index.htm index.nginx-debian.html;
-	server_name _;
-	location /redirect_me {
-		return 301 https://www.youtube.com/watch?v=-VGIt10m9VQ;
-	}
-}" > /etc/nginx/sites-available/default
-sudo service nginx restart
+sudo apt-get -y update
+sudo apt-get -y install nginx
 
+echo "Holberton School" | sudo tee /var/www/html/index.html
+
+# redirection config
+replacement="server_name _;\\
+    rewrite ^/redirect_me https://github.com/Skomaiya/ permanent;"
+sudo sed -i "s|server_name _;|$replacement|" /etc/nginx/sites-available/default
+
+sudo nginx -t
+sudo service nginx start
